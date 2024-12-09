@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Charlie.Order.DataAccess": {
+      "commandName": "Project"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker"
+    }
+  }
+}
