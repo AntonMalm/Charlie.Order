@@ -1,4 +1,4 @@
-namespace Charlie.Order.Pub
+namespace Charlie.Order.RMQ
 {
     public class Worker : BackgroundService
     {

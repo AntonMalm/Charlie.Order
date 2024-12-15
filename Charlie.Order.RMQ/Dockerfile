@@ -7,17 +7,17 @@ WORKDIR /app
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["Charlie.Order.Pub/Charlie.Order.Pub.csproj", "Charlie.Order.Pub/"]
-RUN dotnet restore "./Charlie.Order.Pub/Charlie.Order.Pub.csproj"
+COPY ["Charlie.Order.RMQ/Charlie.Order.RMQ.csproj", "Charlie.Order.RMQ/"]
+RUN dotnet restore "./Charlie.Order.RMQ/Charlie.Order.RMQ.csproj"
 COPY . .
-WORKDIR "/src/Charlie.Order.Pub"
-RUN dotnet build "./Charlie.Order.Pub.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR "/src/Charlie.Order.RMQ"
+RUN dotnet build "./Charlie.Order.RMQ.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Charlie.Order.Pub.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./Charlie.Order.RMQ.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Charlie.Order.Pub.dll"]
+ENTRYPOINT ["dotnet", "Charlie.Order.RMQ.dll"]

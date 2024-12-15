@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Charlie.Order.DataAccess.DataModels
 {
-    public class Order
+    public class OrderModel
     {
         public string Id { get; set; }
         public string CustomerId { get; set; }

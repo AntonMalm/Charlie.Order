@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "Charlie.Order.Pub": {
+    "Charlie.Order.RMQ": {
       "commandName": "Project",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
