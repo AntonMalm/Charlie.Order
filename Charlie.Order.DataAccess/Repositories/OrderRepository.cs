@@ -1,33 +1,46 @@
 ﻿
 using Charlie.Order.DataAccess.DataModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace Charlie.Order.DataAccess.Repositories
 {
     public class OrderRepository : IOrderRepository<OrderModel>
     {
-        public Task AddAsync(OrderModel entity)
+        private readonly OrderDbContext _context;
+
+        public OrderRepository(OrderDbContext context)
         {
-            throw new NotImplementedException();
+            _context = context;
         }
 
-        public Task RemoveAsync(int id)
+        public async Task AddAsync(OrderModel item)
         {
-            throw new NotImplementedException();
+            _context.Order.AddAsync(item);
+            await _context.SaveChangesAsync();
         }
 
-        public Task<IEnumerable<OrderModel>> GetAllAsync()
+        public async Task<IEnumerable<OrderModel>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            return await _context.Order.ToListAsync();
         }
 
-        public Task<OrderModel> GetByIdAsync(int id)
+        public async Task<OrderModel> GetByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            return await _context.Order.FindAsync(id);
         }
 
-        public Task UpdateAsync(OrderModel entity)
+        public async Task RemoveAsync(int id)
         {
-            throw new NotImplementedException();
+            var customer = await GetByIdAsync(id);
+            _context.Order.Remove(customer);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateAsync(OrderModel item)
+        {
+            _context.Order.Update(item);
+            await _context.SaveChangesAsync();
+
         }
     }
 }
