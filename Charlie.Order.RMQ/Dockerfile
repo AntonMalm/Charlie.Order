@@ -1,23 +1,32 @@
-#See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
+# Use .NET SDK to build the application
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
+WORKDIR /App
 
-FROM mcr.microsoft.com/dotnet/runtime:8.0 AS base
-USER app
-WORKDIR /app
-
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
-COPY ["Charlie.Order.RMQ/Charlie.Order.RMQ.csproj", "Charlie.Order.RMQ/"]
-RUN dotnet restore "./Charlie.Order.RMQ/Charlie.Order.RMQ.csproj"
+# Copy everything from the Charlie.Order directory
 COPY . .
-WORKDIR "/src/Charlie.Order.RMQ"
-RUN dotnet build "./Charlie.Order.RMQ.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Charlie.Order.RMQ.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+# Print directory contents for debugging
+RUN ls -la Charlie.Order.RMQ/
+RUN ls -la Charlie.Order.DataAccess/
+RUN ls -la Charlie.Order.Shared/
 
-FROM base AS final
-WORKDIR /app
-COPY --from=publish /app/publish .
+# Restore dependencies
+RUN dotnet restore Charlie.Order.RMQ/Charlie.Order.RMQ.csproj
+
+# Build and publish a release
+RUN dotnet publish Charlie.Order.RMQ/Charlie.Order.RMQ.csproj -c Release -o out
+
+# Use .NET runtime image for running the application
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
+WORKDIR /App
+
+# Copy the published output from the build stage
+COPY --from=build-env /App/out .
+
+# Expose port and set environment variables
+EXPOSE 80
+ENV ASPNETCORE_URLS=http://+:80
+ENV ConnectionStrings__CharlieOrderDb="Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=CharlieOrderTest;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=True;Application Intent=ReadWrite;Multi Subnet Failover=False"
+
+# Run the application
 ENTRYPOINT ["dotnet", "Charlie.Order.RMQ.dll"]

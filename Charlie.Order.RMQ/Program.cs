@@ -6,18 +6,13 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = Host.CreateApplicationBuilder(args);
 
+// Register DbContext
+var connectionString = builder.Configuration.GetConnectionString("OrderDb");
 builder.Services.AddDbContext<OrderDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("OrderDb"))
-);
+    options.UseSqlServer(connectionString));
 
-builder.Services.AddSingleton<RabbitMqClient>();
-
-builder.Services.AddScoped<IOrderRepository<OrderModel>, OrderRepository>();
-//builder.Services.AddSingleton<CustomerMapper>();
-
+// Add other services
 builder.Services.AddHostedService<Worker>();
-
-
 
 var host = builder.Build();
 await host.RunAsync();
