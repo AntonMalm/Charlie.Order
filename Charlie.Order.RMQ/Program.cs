@@ -6,10 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = Host.CreateApplicationBuilder(args);
 
-var connectionString = builder.Configuration.GetConnectionString("OrderDb");
-
 builder.Services.AddDbContext<OrderDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("OrderDb"))
+);
 
 builder.Services.AddSingleton<RabbitMqClient>();
 
